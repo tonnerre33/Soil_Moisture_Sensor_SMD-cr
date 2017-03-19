@@ -127,7 +127,9 @@ void presentation()
   present(CHILD_ID_VOLTAGE, S_MULTIMETER);
   present(CHILD_ID_MOISTURE, S_MOISTURE);
 
-  
+   //Setup LED INFO pin
+   pinMode(LED_PIN_INFO, OUTPUT);
+     
   //Setup done !
   blinkLedFastly(3, LED_PIN_INFO);
 
@@ -142,8 +144,7 @@ void presentation()
 /**************************************************************************************/
 void setup()  
 { 
-  //Setup LED INFO pin
-   pinMode(LED_PIN_INFO, OUTPUT);
+
   //Setup LED WARNING pin
    pinMode(LED_PIN_WARN, OUTPUT);
 
