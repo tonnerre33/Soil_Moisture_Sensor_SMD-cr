@@ -1,6 +1,4 @@
 # Soil Moisture Sensor SMD
-##  
-
 
 # What is this ?
 
@@ -54,3 +52,9 @@ I have put 3 leds on this project :
 * Do not send moisture to the controler if she didn't change more than 1%
 * Change Low Fuse example
 
+## V1.1.2 - In progress
+* Fixed "Do not send moisture to the controler if she didn't change more than 1%"
+* Added possibility to blink the "info" led when insufficient moisture
+* Added possibility to blink the "warning" led when insufficient battery
+* Added possibility to use this node without controler (need mysensors >= 2.1.0)
+* Disable smartsleep when not OTA used (increase battery life)

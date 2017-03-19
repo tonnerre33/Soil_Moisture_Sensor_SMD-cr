@@ -36,9 +36,9 @@
   *  avec boot  ATmegaBOOT_168_atmega328_pro_8MHz.hex
   */
 
-#define MY_NODE_ID 12
+//#define MY_NODE_ID 12
 
-#define MY_DEBUG    // Enables debug messages in the serial log
+//#define MY_DEBUG    // Enables debug messages in the serial log
 //#define MY_DEBUG_VERBOSE_SIGNING
 
 //Enable this if you want to use this node without controler and set MOISTURE_WARN_PCNT != 0
@@ -72,13 +72,13 @@
 #define SKETCH_VERSION        "1.1.2"
 
 
-#define CHILD_ID_VOLTAGE 0 // Id of the sensor child (default 0)
-#define CHILD_ID_MOISTURE 1   // Id of the sensor child (default 1)
-#define BATTERY_SENSE_PIN A0  // select the input pin for the battery sense point (default A0)
-#define LED_PIN_INFO 8 //INFO LED PIN (default 8)
-#define LED_PIN_WARN 3 //WARNING LED PIN (default 3)
-#define MOISTURE_WARN_PCNT  0 //MOISTURE WARNING PERCENT (default 0) 0 = disabled
-#define BATTERY_WARN_PCNT  10 //BATTERY_WARN_PCNT WARNING PERCENT (default 10) 0 = disabled
+#define CHILD_ID_VOLTAGE      0 // Id of the sensor child (default 0)
+#define CHILD_ID_MOISTURE     1   // Id of the sensor child (default 1)
+#define BATTERY_SENSE_PIN     A0  // select the input pin for the battery sense point (default A0)
+#define LED_PIN_INFO          8 //INFO LED PIN (default 8)
+#define LED_PIN_WARN          3 //WARNING LED PIN (default 3)
+#define MOISTURE_WARN_PCNT    0 //MOISTURE WARNING PERCENT (default 0) 0 = disabled
+#define BATTERY_WARN_PCNT     10 //BATTERY_WARN_PCNT WARNING PERCENT (default 10) 0 = disabled
 #define THRESHOLD             1.1     // Only make a new reading with reverse polarity if the change is larger than 10% (default 1.1)
 #define MOISTURE_THRESHOLD    1    // Delta needing for sending moisture to the controler in percent (default 1)
 #define STABILIZATION_TIME    2000    // Let the sensor stabilize before reading (default 2000)
