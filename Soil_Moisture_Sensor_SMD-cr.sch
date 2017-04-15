@@ -5474,7 +5474,7 @@ Battery</text>
 <wire x1="-86.106" y1="17.018" x2="-27.686" y2="17.018" width="0.4064" layer="94" style="longdash"/>
 <wire x1="-86.106" y1="29.718" x2="-27.686" y2="29.718" width="0.4064" layer="94" style="longdash"/>
 <text x="-76.2" y="22.86" size="2.54" layer="94">Measuring Battery Level</text>
-<text x="281.94" y="-91.44" size="2.54" layer="94">V1.1.2a</text>
+<text x="281.94" y="-91.44" size="2.54" layer="94">V1.1.3</text>
 </plain>
 <instances>
 <instance part="IC1" gate="G$1" x="71.12" y="35.56"/>
