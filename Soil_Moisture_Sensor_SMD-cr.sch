@@ -5447,7 +5447,7 @@ Battery</text>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
 <part name="C4" library="LowPowerLab" deviceset="CAP" device="0805-CAP" value="0.1uF"/>
 <part name="J1" library="SparkFun-Connectors" deviceset="CONN_02" device=""/>
-<part name="LED1" library="led" deviceset="LED" device="3MM"/>
+<part name="LED1" library="led" deviceset="LED" device="5MM"/>
 <part name="R5" library="LowPowerLab" deviceset="RESISTOR" device="0805-RES" value="1k5"/>
 <part name="FRAME1" library="frames" deviceset="A3L-LOC" device=""/>
 <part name="U$1" library="JRS-CR123-BatteryHolder" deviceset="CR123-BATTERYHOLDER" device=""/>
