@@ -5428,7 +5428,7 @@ Battery</text>
 <part name="R3" library="LowPowerLab" deviceset="RESISTOR" device="0805-RES" value="1k5"/>
 <part name="D1" library="LowPowerLab" deviceset="LED" device="0805" value=""/>
 <part name="SL2" library="SparkFun-Connectors" deviceset="M06" device="SMD-1MM"/>
-<part name="SL3" library="SparkFun-Connectors" deviceset="M06" device="SIP"/>
+<part name="SL3" library="SparkFun-Connectors" deviceset="M06" device="SMD-1MM"/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="SUPPLY2" library="supply2" deviceset="VCC" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="VCC" device=""/>
@@ -5492,9 +5492,9 @@ Battery</text>
 <instance part="SL3" gate="G$1" x="276.86" y="-20.32" rot="R180"/>
 <instance part="GND4" gate="1" x="228.6" y="-17.78" rot="R270"/>
 <instance part="SUPPLY2" gate="G$1" x="223.52" y="-15.24" rot="R90"/>
-<instance part="SUPPLY3" gate="G$1" x="266.7" y="-20.32" rot="R90"/>
+<instance part="SUPPLY3" gate="G$1" x="266.7" y="-15.24" rot="R90"/>
 <instance part="GND5" gate="1" x="259.08" y="-17.78" rot="R270"/>
-<instance part="GND6" gate="1" x="264.16" y="-15.24" rot="R270"/>
+<instance part="GND6" gate="1" x="264.16" y="-20.32" rot="R270"/>
 <instance part="RF1" gate="G$1" x="264.16" y="93.98"/>
 <instance part="SUPPLY4" gate="G$1" x="246.38" y="116.84"/>
 <instance part="GND7" gate="1" x="233.68" y="116.84" rot="R180"/>
@@ -5567,16 +5567,6 @@ Battery</text>
 <pinref part="GND4" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="SL3" gate="G$1" pin="2"/>
-<pinref part="GND5" gate="1" pin="GND"/>
-<wire x1="261.62" y1="-17.78" x2="271.78" y2="-17.78" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="SL3" gate="G$1" pin="1"/>
-<pinref part="GND6" gate="1" pin="GND"/>
-<wire x1="266.7" y1="-15.24" x2="271.78" y2="-15.24" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="RF1" gate="G$1" pin="GND"/>
 <wire x1="251.46" y1="101.6" x2="238.76" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="C3" gate="G$1" pin="2"/>
@@ -5605,6 +5595,16 @@ Battery</text>
 <pinref part="R7" gate="G$1" pin="2"/>
 <pinref part="GND3" gate="1" pin="GND"/>
 <wire x1="-66.04" y1="-35.56" x2="-66.04" y2="-43.18" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="GND5" gate="1" pin="GND"/>
+<pinref part="SL3" gate="G$1" pin="2"/>
+<wire x1="261.62" y1="-17.78" x2="271.78" y2="-17.78" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="GND6" gate="1" pin="GND"/>
+<pinref part="SL3" gate="G$1" pin="3"/>
+<wire x1="266.7" y1="-20.32" x2="271.78" y2="-20.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="RST" class="0">
@@ -5653,11 +5653,6 @@ Battery</text>
 <wire x1="226.06" y1="-15.24" x2="231.14" y2="-15.24" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="SL3" gate="G$1" pin="3"/>
-<wire x1="271.78" y1="-20.32" x2="269.24" y2="-20.32" width="0.1524" layer="91"/>
-<pinref part="SUPPLY3" gate="G$1" pin="VCC"/>
-</segment>
-<segment>
 <pinref part="RF1" gate="G$1" pin="3V"/>
 <pinref part="SUPPLY4" gate="G$1" pin="VCC"/>
 <wire x1="251.46" y1="106.68" x2="246.38" y2="106.68" width="0.1524" layer="91"/>
@@ -5692,6 +5687,11 @@ Battery</text>
 <pinref part="C5" gate="G$1" pin="2"/>
 <wire x1="-53.34" y1="-5.08" x2="-53.34" y2="-7.62" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="SUPPLY3" gate="G$1" pin="VCC"/>
+<pinref part="SL3" gate="G$1" pin="1"/>
+<wire x1="269.24" y1="-15.24" x2="271.78" y2="-15.24" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="DTR" class="0">
 <segment>
@@ -5700,9 +5700,9 @@ Battery</text>
 <label x="38.1" y="76.2" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="SL3" gate="G$1" pin="6"/>
-<wire x1="271.78" y1="-27.94" x2="254" y2="-27.94" width="0.1524" layer="91"/>
-<label x="254" y="-27.94" size="1.778" layer="95" rot="MR0"/>
+<pinref part="SL3" gate="G$1" pin="4"/>
+<wire x1="271.78" y1="-22.86" x2="254" y2="-22.86" width="0.1524" layer="91"/>
+<label x="254" y="-22.86" size="1.778" layer="95" rot="MR0"/>
 </segment>
 </net>
 <net name="N$6" class="0">
@@ -5773,9 +5773,9 @@ Battery</text>
 </net>
 <net name="D0_RX" class="0">
 <segment>
-<pinref part="SL3" gate="G$1" pin="4"/>
-<wire x1="271.78" y1="-22.86" x2="254" y2="-22.86" width="0.1524" layer="91"/>
-<label x="254" y="-22.86" size="1.778" layer="95" rot="MR0"/>
+<pinref part="SL3" gate="G$1" pin="5"/>
+<wire x1="271.78" y1="-25.4" x2="254" y2="-25.4" width="0.1524" layer="91"/>
+<label x="254" y="-25.4" size="1.778" layer="95" rot="MR0"/>
 </segment>
 <segment>
 <pinref part="IC1" gate="G$1" pin="PD0(RXD)"/>
@@ -5785,9 +5785,9 @@ Battery</text>
 </net>
 <net name="D1_TX" class="0">
 <segment>
-<pinref part="SL3" gate="G$1" pin="5"/>
-<wire x1="271.78" y1="-25.4" x2="254" y2="-25.4" width="0.1524" layer="91"/>
-<label x="254" y="-25.4" size="1.778" layer="95" rot="MR0"/>
+<pinref part="SL3" gate="G$1" pin="6"/>
+<wire x1="271.78" y1="-27.94" x2="254" y2="-27.94" width="0.1524" layer="91"/>
+<label x="254" y="-27.94" size="1.778" layer="95" rot="MR0"/>
 </segment>
 <segment>
 <pinref part="IC1" gate="G$1" pin="PD1(TXD)"/>
@@ -5862,14 +5862,14 @@ Battery</text>
 <wire x1="116.84" y1="30.48" x2="129.54" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$3" class="0">
+<net name="N$3" class="1">
 <segment>
 <pinref part="J1" gate="G$1" pin="2"/>
 <pinref part="IC1" gate="G$1" pin="PC2(ADC2)"/>
 <wire x1="121.92" y1="55.88" x2="96.52" y2="55.88" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$5" class="0">
+<net name="N$5" class="1">
 <segment>
 <pinref part="IC1" gate="G$1" pin="PC1(ADC1)"/>
 <wire x1="121.92" y1="58.42" x2="96.52" y2="58.42" width="0.1524" layer="91"/>
