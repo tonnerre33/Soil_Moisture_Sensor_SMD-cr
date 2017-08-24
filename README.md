@@ -8,6 +8,8 @@ This is my first SMD project, i hope he'll used by other members ;)
 
 The skech is 2.0.0 Mysensors compatible, i haven't test this sketch with the 2.1.1 version.
 
+You can order the pcb here : https://PCBs.io/share/zjX7M
+
 ![Soil Moisture Sensor SMD](https://www.openhardware.io/uploads/58a09467db20b9ab3c6b1055/394/-si3ahz.jpg "Soil Moisture Sensor SMD")
 
 The PCB files are for the V1.1.2 version, i haven't posted the V1.1 because there were important mistakes on the v1.1.
