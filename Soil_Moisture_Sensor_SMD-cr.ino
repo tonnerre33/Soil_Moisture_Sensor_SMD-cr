@@ -44,7 +44,7 @@
 //#define MY_DEBUG_VERBOSE_SIGNING
 
 //Enable this if you want to use this node without controler and set MOISTURE_WARN_PCNT != 0
-#define MY_TRANSPORT_WAIT_READY_MS 5000 //Set for use this node in standalone mode = no need a controler for run (need library mysensors >= 2.1.1) 
+#define MY_TRANSPORT_WAIT_READY_MS 5000 //Set for use this node in standalone mode = no need a controler for run (need library mysensors >= 2.1.0) 
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
@@ -71,7 +71,7 @@
 
 //Constants for MySensors
 #define SKETCH_NAME           "Moisture Sensor SMD"
-#define SKETCH_VERSION        "1.1.2"
+#define SKETCH_VERSION        "1.1.3"
 
 
 #define CHILD_ID_VOLTAGE      0 // Id of the sensor child (default 0)
