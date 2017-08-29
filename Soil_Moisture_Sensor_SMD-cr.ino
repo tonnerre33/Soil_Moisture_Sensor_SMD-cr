@@ -36,11 +36,11 @@
   *  avec boot  ATmegaBOOT_168_atmega328_pro_8MHz.hex
   */
 
-#define NODE_WITHOUT_GATEWAY
+//#define NODE_WITHOUT_GATEWAY //uncomment if you don't use a gateway
 
 //#define MY_NODE_ID 12
 
-#define MY_DEBUG    // Enables debug messages in the serial log
+//#define MY_DEBUG    // Enables debug messages in the serial log
 //#define MY_DEBUG_VERBOSE_SIGNING
 
 //Enable this if you want to use this node without controler and set MOISTURE_WARN_PCNT != 0
