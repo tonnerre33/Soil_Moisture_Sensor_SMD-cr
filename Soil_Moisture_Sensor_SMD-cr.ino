@@ -93,7 +93,7 @@ const int SENSOR_ANALOG_PINS[] = {A1, A2}; //(default {A1, A2})
  #define WARN_TIME             5000 //WARNING REPEAT TIME (in milliseconds) (default 5000)(5sec)
 #else
  #define MEASURE_INTERVAL      3600000 // Minimal Measure interval even if sleep time is smaller (default 3600000)(1 hour)
- #define WARN_TIME             180000 //WARNING REPEAT TIME (in milliseconds) (default 180000)(3min)
+ #define WARN_TIME             45000 //WARNING REPEAT TIME (in milliseconds) (default 180000)(45sec)
 #endif
 
 
