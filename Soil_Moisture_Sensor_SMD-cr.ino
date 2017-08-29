@@ -36,13 +36,15 @@
   *  avec boot  ATmegaBOOT_168_atmega328_pro_8MHz.hex
   */
 
+#define NODE_WITHOUT_GATEWAY
+
 //#define MY_NODE_ID 12
 
-//#define MY_DEBUG    // Enables debug messages in the serial log
+#define MY_DEBUG    // Enables debug messages in the serial log
 //#define MY_DEBUG_VERBOSE_SIGNING
 
 //Enable this if you want to use this node without controler and set MOISTURE_WARN_PCNT != 0
-//#define MY_TRANSPORT_WAIT_READY_MS 5000 //Set for use this node in standalone mode = no need a controler for run (need library mysensors >= 2.1.0) 
+#define MY_TRANSPORT_WAIT_READY_MS 5000 //Set for use this node in standalone mode = no need a controler for run (need library mysensors >= 2.1.1) 
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
@@ -87,7 +89,7 @@
 const int SENSOR_ANALOG_PINS[] = {A1, A2}; //(default {A1, A2})
 
 #ifdef MY_DEBUG
- #define MEASURE_INTERVAL      10000 // Minimal Measure interval even if sleep time is smaller (default 1000)(10 sec)
+ #define MEASURE_INTERVAL      10000 // Minimal Measure interval even if sleep time is smaller (default 10000)(10 sec)
  #define WARN_TIME             5000 //WARNING REPEAT TIME (in milliseconds) (default 5000)(5sec)
 #else
  #define MEASURE_INTERVAL      3600000 // Minimal Measure interval even if sleep time is smaller (default 3600000)(1 hour)
@@ -120,13 +122,14 @@ void presentation()
     unsigned long startTime = millis();
   #endif
 
+
   //Start MySensors and send the sketch version information to the gateway
   sendSketchInfo(SKETCH_NAME, SKETCH_VERSION);
 
   //Register all sensors
   present(CHILD_ID_VOLTAGE, S_MULTIMETER);
   present(CHILD_ID_MOISTURE, S_MOISTURE);
-
+ 
    //Setup LED INFO pin
    pinMode(LED_PIN_INFO, OUTPUT);
      
@@ -173,6 +176,8 @@ void loop()
     #endif
     
   if(lastMeasure >= MEASURE_INTERVAL) {
+
+    
     //Get moisture level
     int moistureLevel = readMoisture();
   
@@ -203,7 +208,9 @@ void loop()
     {   
      if (moisturePcnt >= (oldMoisturePcnt +  MOISTURE_THRESHOLD) || moisturePcnt <= (oldMoisturePcnt - MOISTURE_THRESHOLD) || oldMoisturePcnt == -1) //Send moisture only if moisture percent changed more than MOISTURE_THRESHOLD (control if display changed)
       {
+        #ifndef NODE_WITHOUT_GATEWAY
          send(msgMoisture.set(moisturePcnt)); 
+        #endif
          blinkLedFastly(1, LED_PIN_INFO);       
         //Store current moisture pcnt
         oldMoisturePcnt = moisturePcnt;
@@ -214,12 +221,7 @@ void loop()
     }
   }
 
-//LED WARNING MOISTURE
-if(moisturePcnt < MOISTURE_WARN_PCNT)
-{
- if( WARN_TIME < MEASURE_INTERVAL){ sleepTime = WARN_TIME; }
- blinkLedFastly(1, LED_PIN_WARN);
-}
+
 
 if(lastMeasure >= MEASURE_INTERVAL) {
     //Report data to the gateway
@@ -229,26 +231,46 @@ if(lastMeasure >= MEASURE_INTERVAL) {
    if (batteryPcnt > 100) {batteryPcnt = 100;}
    if (batteryPcnt <= 0) {batteryPcnt = 0;}          
    if (oldbatteryPcnt != batteryPcnt) {
+    #ifndef NODE_WITHOUT_GATEWAY
       send(msgVolt.set(voltage / 1000.0, 2));
       sendBatteryLevel(batteryPcnt);
+    #endif
      oldbatteryPcnt = batteryPcnt;
 
    }
 }
 
-//LED WARNING BATTERY
-if(batteryPcnt < BATTERY_WARN_PCNT)
-{
- if( WARN_TIME < MEASURE_INTERVAL){ sleepTime = WARN_TIME; }
- blinkLedFastly(3, LED_PIN_WARN);
-}
-
-
 if(lastMeasure >= MEASURE_INTERVAL) {
- lastMeasure = sleepTime;
+ lastMeasure = 0;
 }else{
- lastMeasure = lastMeasure + sleepTime;
+ lastMeasure = lastMeasure + WARN_TIME;
 }
+
+
+if(batteryPcnt < BATTERY_WARN_PCNT || moisturePcnt < MOISTURE_WARN_PCNT)
+{
+ if(WARN_TIME < MEASURE_INTERVAL){ 
+  if(lastMeasure >= MEASURE_INTERVAL){ // If measure decrease sleep time by the time took for the measure
+      blinkLedFastly(1, LED_PIN_INFO);
+    sleepTime = WARN_TIME - STABILIZATION_TIME; 
+  }else{
+      blinkLedFastly(2, LED_PIN_INFO);
+    sleepTime = WARN_TIME; 
+  }
+ }
+   //LED WARNING MOISTURE
+ if(moisturePcnt < MOISTURE_WARN_PCNT) {blinkLedFastly(1, LED_PIN_WARN);}
+ //LED WARNING BATTERY
+ if(batteryPcnt < BATTERY_WARN_PCNT){blinkLedFastly(3, LED_PIN_WARN);} 
+}
+else{
+  blinkLedFastly(3, LED_PIN_INFO);
+   sleepTime = MEASURE_INTERVAL;
+}
+
+
+
+
 
 
    //Print debug
