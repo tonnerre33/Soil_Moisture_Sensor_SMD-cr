@@ -41,6 +41,7 @@
 //#define MY_NODE_ID 12
 //#define MY_DEBUG    // Enables debug messages in the serial log
 
+
 #ifdef NODE_WITHOUT_GATEWAY
 //if you want to use this node without controler set MOISTURE_WARN_PCNT != 0
 #define MY_TRANSPORT_WAIT_READY_MS 10 //Set for use this node in standalone mode = no need a controler for run (need library mysensors >= 2.1.0)
@@ -120,187 +121,190 @@ MyMessage msgMoisture(CHILD_ID_MOISTURE, V_HUM);
 /**************************************************************************************/
 void presentation()
 {
-  //Get time (for presentation)
-  #ifdef MY_DEBUG
-  unsigned long startTime = millis();
-  #endif
-  
-  #ifndef NODE_WITHOUT_GATEWAY
-  //Start MySensors and send the sketch version information to the gateway
-  sendSketchInfo(SKETCH_NAME, SKETCH_VERSION);
-  
-  //Register all sensors
-  present(CHILD_ID_VOLTAGE, S_MULTIMETER);
-  present(CHILD_ID_MOISTURE, S_MOISTURE);
-  #endif
-  
-  //Setup LED INFO pin
-  pinMode(LED_PIN_INFO, OUTPUT);
-  
-  //Setup done !
-  blinkLedFastly(3, LED_PIN_INFO);
-  
-  //Print setup debug
-  #ifdef MY_DEBUG
-  int duration = millis() - startTime;
-  Serial.print("[Presentation duration: "); Serial.print(duration, DEC); Serial.println(" ms]");
-  #endif
-  }
+	//Get time (for presentation)
+	#ifdef MY_DEBUG
+	unsigned long startTime = millis();
+	#endif
+	
+	#ifndef NODE_WITHOUT_GATEWAY
+	//Start MySensors and send the sketch version information to the gateway
+	sendSketchInfo(SKETCH_NAME, SKETCH_VERSION);
+	
+	//Register all sensors
+	present(CHILD_ID_VOLTAGE, S_MULTIMETER);
+	present(CHILD_ID_MOISTURE, S_MOISTURE);
+	#endif
+	
+	
+	//Setup LED INFO pin
+	pinMode(LED_PIN_INFO, OUTPUT);
+	
+	//Setup done !
+	blinkLedFastly(3, LED_PIN_INFO);
+	
+	//Print setup debug
+	#ifdef MY_DEBUG
+	int duration = millis() - startTime;
+	Serial.print("[Presentation duration: "); Serial.print(duration, DEC); Serial.println(" ms]");
+	#endif
+	}
 /**************************************************************************************/
 /* Initialization                                                                     */
 /**************************************************************************************/
 void setup()
 {
-  
-  //Setup LED WARNING pin
-  pinMode(LED_PIN_WARN, OUTPUT);
-  
-  //Set moisutre sensor pins
-  for (int i = 0; i < N_ELEMENTS(SENSOR_ANALOG_PINS); i++)
-  {
-    pinMode(SENSOR_ANALOG_PINS[i], OUTPUT);
-    digitalWrite(SENSOR_ANALOG_PINS[i], LOW);
-    }
-  
-  }
+	
+	//Setup LED WARNING pin
+	pinMode(LED_PIN_WARN, OUTPUT);
+	
+	//Set moisutre sensor pins
+	for (int i = 0; i < N_ELEMENTS(SENSOR_ANALOG_PINS); i++)
+	{
+		pinMode(SENSOR_ANALOG_PINS[i], OUTPUT);
+		digitalWrite(SENSOR_ANALOG_PINS[i], LOW);
+		}
+	
+	}
 
 /**************************************************************************************/
 /* Main loop                                                                          */
 /**************************************************************************************/
 void loop()
 {
-  //Get time (for a complete loop)
-  #ifdef MY_DEBUG
-  unsigned long startTime = millis();
-  #endif
-  
-  #ifdef MY_DEBUG
-  Serial.print("lastMeasure: ");
-  Serial.println(lastMeasure);
-  #endif
-  
-  if(lastMeasure >= MEASURE_INTERVAL) {
-    
-    
-    //Get moisture level
-    int moistureLevel = readMoisture();
-    
-    //Send rolling average of 2 samples to get rid of the "ripple" produced by different resistance in the internal pull-up resistors
-    //See http://forum.mysensors.org/topic/2147/office-plant-monitoring/55 for more information
-    
-    //Verify if current measurement is not too far from the previous one
-    if (moistureLevel > (oldMoistureLevel * THRESHOLD) || moistureLevel < (oldMoistureLevel / THRESHOLD))
-    {
-      //The change was large, so it was probably not caused by the difference in internal pull-ups.
-      //Measure again, this time with reversed polarity.
-      moistureLevel = readMoisture();
-      }
-    
-    
-    #ifdef MY_DEBUG
-    Serial.print("Soil Value: ");
-    Serial.println(moistureLevel);
-    #endif
-    
-    if (oldMoistureLevel == -1) {
-      oldMoistureLevel = moistureLevel;
-      }
-    
-    // int moisturePcnt = (moistureLevel + oldMoistureLevel) / 2.0 / 10.23;
-    moisturePcnt = moistureLevel / 10.23;
-    if (moistureLevel >= (oldMoistureLevel +  10.23 * MOISTURE_THRESHOLD) || moistureLevel <= (oldMoistureLevel - 10.23 * MOISTURE_THRESHOLD) || oldMoisturePcnt == -1) //Send moisture only if moisture changed more than MOISTURE_THRESHOLD (control change value percent and not a cast)
-    {
-      if (moisturePcnt >= (oldMoisturePcnt +  MOISTURE_THRESHOLD) || moisturePcnt <= (oldMoisturePcnt - MOISTURE_THRESHOLD) || oldMoisturePcnt == -1) //Send moisture only if moisture percent changed more than MOISTURE_THRESHOLD (control if display changed)
-      {
-        #ifndef NODE_WITHOUT_GATEWAY
-        send(msgMoisture.set(moisturePcnt));
-        #endif
-        //Store current moisture pcnt
-        oldMoisturePcnt = moisturePcnt;
-        //Store current moisture level
-        oldMoistureLevel = moistureLevel;
-        
-        }
-      }
-    }
-  
-  
-  
-  if(lastMeasure >= MEASURE_INTERVAL) {
-    //Report data to the gateway
-    long voltage = getVoltageByHard();
-    batteryPcnt = round((voltage - BATTERY_ZERO) * 100.0 / (BATTERY_FULL - BATTERY_ZERO));
-    
-    if (batteryPcnt > 100) {batteryPcnt = 100;}
-    if (batteryPcnt <= 0) {batteryPcnt = 0;}
-    if (oldbatteryPcnt != batteryPcnt) {
-      #ifndef NODE_WITHOUT_GATEWAY
-      send(msgVolt.set(voltage / 1000.0, 2));
-      sendBatteryLevel(batteryPcnt);
-      #endif
-      oldbatteryPcnt = batteryPcnt;
-      
-      }
-    }
-  
-  if(lastMeasure >= MEASURE_INTERVAL) {
-    lastMeasure = 0;
-    }else{
-    lastMeasure = lastMeasure + sleepTime;
-    }
-  
-  //Calcul next sleep time
-  if(batteryPcnt < BATTERY_WARN_PCNT || moisturePcnt < MOISTURE_WARN_PCNT)
-  {
-    if(WARN_TIME < MEASURE_INTERVAL){
-      if(lastMeasure >= MEASURE_INTERVAL){ // if next loop = measure
-        #ifdef MY_DEBUG
-        blinkLedFastly(1, LED_PIN_INFO);
-        #endif
-        sleepTime = WARN_TIME - STABILIZATION_TIME;
-        }else{
-        #ifdef MY_DEBUG
-        blinkLedFastly(2, LED_PIN_INFO);
-        #endif
-        sleepTime = WARN_TIME;
-        }
-      }
-    
-    //LED WARNING MOISTURE
-    if(moisturePcnt < MOISTURE_WARN_PCNT) {blinkLedFastly(1, LED_PIN_WARN);}
-    //LED WARNING BATTERY
-    if(batteryPcnt < BATTERY_WARN_PCNT){blinkLedFastly(3, LED_PIN_WARN);}
-    }
-  else{
-    blinkLedFastly(3, LED_PIN_INFO);
-    sleepTime = MEASURE_INTERVAL;
-    }
-  
-  
-  
-  
-  
-  
-  //Print debug
-  #ifdef MY_DEBUG
-  Serial.print(moisturePcnt);
-  Serial.print("%");
-  Serial.print("   ");
-  Serial.print(batteryPcnt);
-  Serial.print("%");
-  int duration = millis() - startTime;
-  Serial.print("   ");
-  Serial.print("["); Serial.print(duration, DEC); Serial.println(" ms]");
-  Serial.flush();
-  #endif
-  
-  //Sleep until next measurement - smart sleep for OTA
-  #ifdef MY_OTA
-  smartSleep(sleepTime);
-  #else
-  sleep(sleepTime);
-  #endif
-  }
+	//Get time (for a complete loop)
+	#ifdef MY_DEBUG
+	unsigned long startTime = millis();
+	#endif
+	
+	#ifdef MY_DEBUG
+	Serial.print("lastMeasure: ");
+	Serial.println(lastMeasure);
+	#endif
+	
+	if(lastMeasure >= MEASURE_INTERVAL) {
+		
+		
+		//Get moisture level
+		int moistureLevel = readMoisture();
+		
+		//Send rolling average of 2 samples to get rid of the "ripple" produced by different resistance in the internal pull-up resistors
+		//See http://forum.mysensors.org/topic/2147/office-plant-monitoring/55 for more information
+		
+		//Verify if current measurement is not too far from the previous one
+		if (moistureLevel > (oldMoistureLevel * THRESHOLD) || moistureLevel < (oldMoistureLevel / THRESHOLD))
+		{
+			//The change was large, so it was probably not caused by the difference in internal pull-ups.
+			//Measure again, this time with reversed polarity.
+			moistureLevel = readMoisture();
+			}
+		
+		
+		#ifdef MY_DEBUG
+		Serial.print("Soil Value: ");
+		Serial.println(moistureLevel);
+		#endif
+		
+		if (oldMoistureLevel == -1) {
+			oldMoistureLevel = moistureLevel;
+			}
+		
+		// int moisturePcnt = (moistureLevel + oldMoistureLevel) / 2.0 / 10.23;
+		moisturePcnt = moistureLevel / 10.23;
+		if (moistureLevel >= (oldMoistureLevel +  10.23 * MOISTURE_THRESHOLD) || moistureLevel <= (oldMoistureLevel - 10.23 * MOISTURE_THRESHOLD) || oldMoisturePcnt == -1) //Send moisture only if moisture changed more than MOISTURE_THRESHOLD (control change value percent and not a cast)
+		{
+			if (moisturePcnt >= (oldMoisturePcnt +  MOISTURE_THRESHOLD) || moisturePcnt <= (oldMoisturePcnt - MOISTURE_THRESHOLD) || oldMoisturePcnt == -1) //Send moisture only if moisture percent changed more than MOISTURE_THRESHOLD (control if display changed)
+			{
+				#ifndef NODE_WITHOUT_GATEWAY
+				send(msgMoisture.set(moisturePcnt));
+				#endif
+				//Store current moisture pcnt
+				oldMoisturePcnt = moisturePcnt;
+				//Store current moisture level
+				oldMoistureLevel = moistureLevel;
+				
+				
+				}
+			}
+		}
+	if(lastMeasure >= MEASURE_INTERVAL) {
+		//Report data to the gateway
+		long voltage = getVoltageByHard();
+		batteryPcnt = round((voltage - BATTERY_ZERO) * 100.0 / (BATTERY_FULL - BATTERY_ZERO));
+		
+		if (batteryPcnt > 100) {batteryPcnt = 100;}
+		if (batteryPcnt <= 0) {batteryPcnt = 0;}
+		if (oldbatteryPcnt != batteryPcnt) {
+			#ifndef NODE_WITHOUT_GATEWAY
+			send(msgVolt.set(voltage / 1000.0, 2));
+			sendBatteryLevel(batteryPcnt);
+			#endif
+			oldbatteryPcnt = batteryPcnt;
+			
+			
+			}
+		}
+	
+	if(lastMeasure >= MEASURE_INTERVAL) {
+		lastMeasure = 0;
+		}else{
+		lastMeasure = lastMeasure + sleepTime;
+		}
+	
+	//Calcul next sleep time
+	
+	
+	if(batteryPcnt < BATTERY_WARN_PCNT || moisturePcnt < MOISTURE_WARN_PCNT)
+	{
+		if(WARN_TIME < MEASURE_INTERVAL){
+			if(lastMeasure >= MEASURE_INTERVAL){ // if next loop = measure
+				#ifdef MY_DEBUG
+				blinkLedFastly(1, LED_PIN_INFO);
+				#endif
+				sleepTime = WARN_TIME - STABILIZATION_TIME;
+				}else{
+				#ifdef MY_DEBUG
+				blinkLedFastly(2, LED_PIN_INFO);
+				#endif
+				sleepTime = WARN_TIME;
+				}
+			}
+		
+		//LED WARNING MOISTURE
+		if(moisturePcnt < MOISTURE_WARN_PCNT) {blinkLedFastly(1, LED_PIN_WARN);}
+		//LED WARNING BATTERY
+		if(batteryPcnt < BATTERY_WARN_PCNT){blinkLedFastly(3, LED_PIN_WARN);}
+		
+		}
+	else{
+		blinkLedFastly(3, LED_PIN_INFO);
+		sleepTime = MEASURE_INTERVAL;
+		}
+	
+	
+	
+	
+	
+	
+	//Print debug
+	#ifdef MY_DEBUG
+	Serial.print(moisturePcnt);
+	Serial.print("%");
+	Serial.print("   ");
+	Serial.print(batteryPcnt);
+	Serial.print("%");
+	int duration = millis() - startTime;
+	Serial.print("   ");
+	Serial.print("["); Serial.print(duration, DEC); Serial.println(" ms]");
+	Serial.flush();
+	#endif
+	
+	//Sleep until next measurement - smart sleep for OTA
+	#ifdef MY_OTA
+	smartSleep(sleepTime);
+	#else
+	sleep(sleepTime);
+	#endif
+	}
 
 
 /**************************************************************************************/
@@ -308,36 +312,36 @@ void loop()
 /**************************************************************************************/
 int readMoisture()
 {
-  //Power on the sensor and read once to let the ADC capacitor start charging
-  pinMode(SENSOR_ANALOG_PINS[direction], INPUT_PULLUP);
-  analogRead(SENSOR_ANALOG_PINS[direction]);
-  
-  //Stabilize and read the value
-  sleep(STABILIZATION_TIME);
-  int moistureLevel = (1023 - analogRead(SENSOR_ANALOG_PINS[direction]));
-  
-  //Turn off the sensor to conserve battery and minimize corrosion
-  pinMode(SENSOR_ANALOG_PINS[direction], OUTPUT);
-  digitalWrite(SENSOR_ANALOG_PINS[direction], LOW);
-  
-  //Make direction alternate between 0 and 1 to reverse polarity which reduces corrosion
-  direction = (direction + 1) % 2;
-  return moistureLevel;
-  }
+	//Power on the sensor and read once to let the ADC capacitor start charging
+	pinMode(SENSOR_ANALOG_PINS[direction], INPUT_PULLUP);
+	analogRead(SENSOR_ANALOG_PINS[direction]);
+	
+	//Stabilize and read the value
+	sleep(STABILIZATION_TIME);
+	int moistureLevel = (1023 - analogRead(SENSOR_ANALOG_PINS[direction]));
+	
+	//Turn off the sensor to conserve battery and minimize corrosion
+	pinMode(SENSOR_ANALOG_PINS[direction], OUTPUT);
+	digitalWrite(SENSOR_ANALOG_PINS[direction], LOW);
+	
+	//Make direction alternate between 0 and 1 to reverse polarity which reduces corrosion
+	direction = (direction + 1) % 2;
+	return moistureLevel;
+	}
 
 /**************************************************************************************/
 /* Allows to fastly blink the LED.                                                    */
 /**************************************************************************************/
 void blinkLedFastly(byte loop, byte pinToBlink)
 {
-  byte delayOn = 150;
-  byte delayOff = 150;
-  for (int i = 0; i < loop; i++)
-  {
-    blinkLed(pinToBlink, delayOn);
-    delay(delayOff);
-    }
-  }
+	byte delayOn = 150;
+	byte delayOff = 150;
+	for (int i = 0; i < loop; i++)
+	{
+		blinkLed(pinToBlink, delayOn);
+		delay(delayOff);
+		}
+	}
 
 
 /**************************************************************************************/
@@ -345,10 +349,10 @@ void blinkLedFastly(byte loop, byte pinToBlink)
 /**************************************************************************************/
 void blinkLed(byte pinToBlink, int delayInMs)
 {
-  digitalWrite(pinToBlink,HIGH);
-  delay(delayInMs);
-  digitalWrite(pinToBlink,LOW);
-  }
+	digitalWrite(pinToBlink,HIGH);
+	delay(delayInMs);
+	digitalWrite(pinToBlink,LOW);
+	}
 
 /**************************************************************************************/
 /* Allows to get the real Vcc (return value in mV).                                   */
@@ -356,20 +360,20 @@ void blinkLed(byte pinToBlink, int delayInMs)
 /**************************************************************************************/
 long getVoltageBySoft()
 {
-  ADMUX = (0<<REFS1) | (1<<REFS0) | (0<<ADLAR) | (1<<MUX3) | (1<<MUX2) | (1<<MUX1) | (0<<MUX0);
-  delay(50);  // Let mux settle a little to get a more stable A/D conversion
-  //Start a conversion
-  ADCSRA |= _BV( ADSC );
-  //Wait for it to complete
-  while (bit_is_set(ADCSRA, ADSC));
-  
-  //Compute and return the value
-  uint8_t low  = ADCL;                  // must read ADCL first - it then locks ADCH
-  uint8_t high = ADCH;                  // unlocks both
-  long result = (high << 8) | low;
-  result = 1125300L / result;           // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
-  return result;                        // Vcc in millivolts
-  }
+	ADMUX = (0<<REFS1) | (1<<REFS0) | (0<<ADLAR) | (1<<MUX3) | (1<<MUX2) | (1<<MUX1) | (0<<MUX0);
+	delay(50);  // Let mux settle a little to get a more stable A/D conversion
+	//Start a conversion
+	ADCSRA |= _BV( ADSC );
+	//Wait for it to complete
+	while (bit_is_set(ADCSRA, ADSC));
+	
+	//Compute and return the value
+	uint8_t low  = ADCL;                  // must read ADCL first - it then locks ADCH
+	uint8_t high = ADCH;                  // unlocks both
+	long result = (high << 8) | low;
+	result = 1125300L / result;           // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
+	return result;                        // Vcc in millivolts
+	}
 
 
 /**************************************************************************************/
@@ -378,48 +382,48 @@ long getVoltageBySoft()
 /**************************************************************************************/
 long getVoltageByHard()
 {
-  analogReference(INTERNAL);
-  
-  // get the battery Voltage
-  int sensorValue = analogRead(BATTERY_SENSE_PIN);
-  #ifdef MY_DEBUG
-  Serial.print("Battery Value: ");
-  Serial.println(sensorValue);
-  #endif
-  
-  //L'analog reférence ne change que lorsque l'on fait un analogread et il met un peu de temps à changer, d'où la tempo et la répétition de la commande analogRead
-  delay(1000);     // this delay is needed
-  sensorValue = analogRead(BATTERY_SENSE_PIN);
-  
-  
-  #ifdef MY_DEBUG
-  Serial.print("Battery Value: ");
-  Serial.println(sensorValue);
-  #endif
-  
-  // 1M, 470K divider across battery and using internal ADC ref of 1.1V
-  // Sense point is bypassed with 0.1 uF cap to reduce noise at that point
-  // ((1e6+470e3)/470e3)*1.1 = Vmax = 3.44 Volts
-  // 3.44/1023 = Volts per bit = 0.003363075
-  
-  float batteryV  = sensorValue * 0.003363075;
-  int batteryMv  = round(batteryV * 1000);
-  // int batteryPcnt = sensorValue * 0.0977517106549365;
-  
-  int batteryPcnt = round((batteryMv - BATTERY_ZERO) * 100.0 / (BATTERY_FULL - BATTERY_ZERO));
-  if (batteryPcnt > 100) {batteryPcnt = 100;}
-  
-  #ifdef MY_DEBUG
-  
-  Serial.print("Battery Voltage: ");
-  Serial.print(batteryMv);
-  Serial.println(" mV");
-  
-  Serial.print("Battery percent: ");
-  Serial.print(batteryPcnt);
-  Serial.println(" %");
-  #endif
-  
-  analogReference(DEFAULT);
-  return batteryMv;                        // Vcc in mV
-  }
+	analogReference(INTERNAL);
+	
+	// get the battery Voltage
+	int sensorValue = analogRead(BATTERY_SENSE_PIN);
+	#ifdef MY_DEBUG
+	Serial.print("Battery Value: ");
+	Serial.println(sensorValue);
+	#endif
+	
+	//L'analog reférence ne change que lorsque l'on fait un analogread et il met un peu de temps à changer, d'où la tempo et la répétition de la commande analogRead
+	delay(1000);     // this delay is needed
+	sensorValue = analogRead(BATTERY_SENSE_PIN);
+	
+	
+	#ifdef MY_DEBUG
+	Serial.print("Battery Value: ");
+	Serial.println(sensorValue);
+	#endif
+	
+	// 1M, 470K divider across battery and using internal ADC ref of 1.1V
+	// Sense point is bypassed with 0.1 uF cap to reduce noise at that point
+	// ((1e6+470e3)/470e3)*1.1 = Vmax = 3.44 Volts
+	// 3.44/1023 = Volts per bit = 0.003363075
+	
+	float batteryV  = sensorValue * 0.003363075;
+	int batteryMv  = round(batteryV * 1000);
+	// int batteryPcnt = sensorValue * 0.0977517106549365;
+	
+	int batteryPcnt = round((batteryMv - BATTERY_ZERO) * 100.0 / (BATTERY_FULL - BATTERY_ZERO));
+	if (batteryPcnt > 100) {batteryPcnt = 100;}
+	
+	#ifdef MY_DEBUG
+	
+	Serial.print("Battery Voltage: ");
+	Serial.print(batteryMv);
+	Serial.println(" mV");
+	
+	Serial.print("Battery percent: ");
+	Serial.print(batteryPcnt);
+	Serial.println(" %");
+	#endif
+	
+	analogReference(DEFAULT);
+	return batteryMv;                        // Vcc in mV
+	}
